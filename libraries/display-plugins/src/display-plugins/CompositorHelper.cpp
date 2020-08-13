@@ -172,8 +172,10 @@ bool CompositorHelper::isHMD() const {
 QPointF CompositorHelper::getMouseEventPosition(QMouseEvent* event) {
     if (isHMD()) {
         QMutexLocker locker(&_reticleLock);
+        qDebug() << _reticlePositionInHMD.x << _reticlePositionInHMD.y;
         return QPointF(_reticlePositionInHMD.x, _reticlePositionInHMD.y);
     }
+    qDebug() << event->localPos();
     return event->localPos();
 }
 
@@ -186,6 +188,22 @@ static bool isWindowActive() {
     return false;
 }
 
+bool CompositorHelper::firstPersonShouldCaptureMouse() const {
+    if (!_allowMouseCapture) {
+        return false;
+    }
+
+    if (!isWindowActive()) {
+        return false;
+    }
+
+    if (ui::Menu::isSomeSubmenuShown()) {
+        return false;
+    }
+    
+    return true;
+}
+
 bool CompositorHelper::shouldCaptureMouse() const {
     if (!_allowMouseCapture) {
         return false;
@@ -194,7 +212,6 @@ bool CompositorHelper::shouldCaptureMouse() const {
     if (!isHMD()) {
         return false;
     }
-
 
     if (!isWindowActive()) {
         return false;
@@ -287,6 +304,17 @@ bool CompositorHelper::handleRealMouseMoveEvent(bool sendFakeEvent) {
         _lastKnownRealMouse = QCursor::pos();
     }
     return false; // let the caller know to process the event
+}
+
+bool CompositorHelper::handleFirstPersonCaptureMouseMoveEvent() {
+    if (firstPersonShouldCaptureMouse()) {
+        QScreen* screen = QGuiApplication::primaryScreen();
+        QRect screenGeometry = screen->geometry();
+        _ignoreNextMouseMove = true;
+        QCursor::setPos(QPoint(screenGeometry.width() / 2, screenGeometry.height() / 2));  // move cursor back to where it was
+        return false;
+    }
+    return false;
 }
 
 glm::vec2 CompositorHelper::getReticlePosition() const {

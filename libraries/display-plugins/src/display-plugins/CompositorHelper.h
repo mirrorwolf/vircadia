@@ -52,7 +52,11 @@ public:
     void setRenderingWidget(QWidget* widget) { _renderingWidget = widget; }
 
     bool calculateRayUICollisionPoint(const glm::vec3& position, const glm::vec3& direction, glm::vec3& result) const;
-    bool calculateParabolaUICollisionPoint(const glm::vec3& origin, const glm::vec3& velocity, const glm::vec3& acceleration, glm::vec3& result, float& parabolicDistance) const;
+    bool calculateParabolaUICollisionPoint(const glm::vec3& origin,
+                                           const glm::vec3& velocity,
+                                           const glm::vec3& acceleration,
+                                           glm::vec3& result,
+                                           float& parabolicDistance) const;
 
     bool isHMD() const;
     bool fakeEventActive() const { return _fakeMouseEvent; }
@@ -61,8 +65,8 @@ public:
     // Frame of reference:
     // Spherical: Polar coordinates that gives the position on the sphere we project on (yaw,pitch)
     // Overlay: Position on the overlay (x,y)
-    glm::vec2 sphericalToOverlay(const glm::vec2 & sphericalPos) const;
-    glm::vec2 overlayToSpherical(const glm::vec2 & overlayPos) const;
+    glm::vec2 sphericalToOverlay(const glm::vec2& sphericalPos) const;
+    glm::vec2 overlayToSpherical(const glm::vec2& overlayPos) const;
     void computeHmdPickRay(const glm::vec2& cursorPos, glm::vec3& origin, glm::vec3& direction) const;
 
     glm::vec2 overlayFromSphereSurface(const glm::vec3& sphereSurfacePoint) const;
@@ -76,7 +80,12 @@ public:
     glm::mat4 getUiTransform() const;
 
     float getAlpha() const { return _alpha; }
-    void setAlpha(float alpha) { if (alpha != _alpha) { emit alphaChanged();  _alpha = alpha; } }
+    void setAlpha(float alpha) {
+        if (alpha != _alpha) {
+            emit alphaChanged();
+            _alpha = alpha;
+        }
+    }
 
     bool getReticleVisible() const { return _reticleVisible; }
     void setReticleVisible(bool visible) { _reticleVisible = visible; }
@@ -91,19 +100,26 @@ public:
     glm::vec2 getReticleMaximumPosition() const;
 
     glm::mat4 getReticleTransform(const glm::mat4& eyePose = glm::mat4(), const glm::vec3& headPosition = glm::vec3()) const;
-    glm::mat4 getPoint2DTransform(const glm::vec2& point, float sizeX , float sizeY) const;
+    glm::mat4 getPoint2DTransform(const glm::vec2& point, float sizeX, float sizeY) const;
 
     ReticleInterface* getReticleInterface() { return _reticleInterface; }
 
     /// return value - true means the caller should not process the event further
     bool handleRealMouseMoveEvent(bool sendFakeEvent = true);
+    bool handleFirstPersonCaptureMouseMoveEvent();
     void handleLeaveEvent();
     QPointF getMouseEventPosition(QMouseEvent* event);
 
+    QPointF getLastKnownMousePosition() { return _lastKnownRealMouse; }
+
     bool shouldCaptureMouse() const;
+    bool firstPersonShouldCaptureMouse() const;
 
     bool getAllowMouseCapture() const { return _allowMouseCapture; }
     void setAllowMouseCapture(bool capture);
+    
+    bool getIgnoreNextMouseMove() const { return _ignoreNextMouseMove; }
+    void setIgnoreNextMouseMove(bool shouldIgnore) { _ignoreNextMouseMove = shouldIgnore; }
 
     /// if the reticle is pointing to a system overlay (a dialog box for example) then the function returns true otherwise false
     bool getReticleOverDesktop() const;
@@ -169,6 +185,8 @@ private:
     std::atomic<bool> _allowMouseCapture { true };
 
     bool _fakeMouseEvent { false };
+    
+    bool _ignoreNextMouseMove { false };
 
     ReticleInterface* _reticleInterface { nullptr };
 };

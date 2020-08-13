@@ -4696,10 +4696,18 @@ void Application::mouseMoveEvent(QMouseEvent* event) {
     maybeToggleMenuVisible(event);
 
     auto& compositor = getApplicationCompositor();
+    
+    bool _ignoreNextMouseMove = compositor.getIgnoreNextMouseMove();
+    
     // if this is a real mouse event, and we're in HMD mode, then we should use it to move the
     // compositor reticle
     // handleRealMouseMoveEvent() will return true, if we shouldn't process the event further
     if (!compositor.fakeEventActive() && compositor.handleRealMouseMoveEvent()) {
+        return; // bail
+    }
+    
+    if (!compositor.fakeEventActive() && compositor.handleFirstPersonCaptureMouseMoveEvent()) {
+        // event->accept();
         return; // bail
     }
 
@@ -4737,9 +4745,13 @@ void Application::mouseMoveEvent(QMouseEvent* event) {
         return;
     }
 
-    if (_keyboardMouseDevice->isActive()) {
+    if (_keyboardMouseDevice->isActive() && !_ignoreNextMouseMove) {
+        qCDebug(interfaceapp) << "_ignoreNextMouseMove" << _ignoreNextMouseMove;
         _keyboardMouseDevice->mouseMoveEvent(event);
     }
+
+    compositor.setIgnoreNextMouseMove(false);
+    qCDebug(interfaceapp) << "_ignoreNextMouseMove" << _ignoreNextMouseMove;
 }
 
 void Application::mousePressEvent(QMouseEvent* event) {

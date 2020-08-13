@@ -205,20 +205,19 @@
         },
 
         { "from": { "makeAxis" : ["Keyboard.MouseMoveLeft", "Keyboard.MouseMoveRight"] },
-          "when": "Keyboard.RightMouseButton",
           "to": "Actions.DeltaYaw",
           "filters":
             [
-                { "type": "scale", "scale": 0.6 }
+                { "type": "scale", "scale": 0.2 }
             ]
         },
 
         { "from": { "makeAxis" : ["Keyboard.MouseMoveUp", "Keyboard.MouseMoveDown"] },
-          "when": ["!Application.CameraSelfie", "!Application.CameraLookAt", "Keyboard.RightMouseButton"],
+          "when": ["!Application.CameraSelfie", "!Application.CameraLookAt"],
           "to": "Actions.DeltaPitch",
           "filters":
             [
-                { "type": "scale", "scale": 0.6 }
+                { "type": "scale", "scale": 0.2 }
             ]
         },
 
