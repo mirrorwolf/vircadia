@@ -234,6 +234,7 @@
     };
     
     this.unload = function(entityID) {
+        Entities.webEventReceived.disconnect(onWebAppEventReceived);
         Messages.messageReceived.disconnect(onMessageReceived);
         Messages.unsubscribe(presentationChannel);
     };
