@@ -4785,13 +4785,13 @@ void Application::mousePressEvent(QMouseEvent* event) {
 
 #if defined(Q_OS_MAC)
     // Fix for OSX right click dragging on window when coming from a native window
-    bool isFocussed = hasFocus();
-    if (!isFocussed && event->button() == Qt::MouseButton::RightButton) {
+    bool isFocused = hasFocus();
+    if (!isFocused && event->button() == Qt::MouseButton::RightButton) {
         setFocus();
-        isFocussed = true;
+        isFocused = true;
     }
 
-    if (isFocussed) {
+    if (isFocused) {
 #else
     if (hasFocus()) {
 #endif
