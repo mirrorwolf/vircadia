@@ -4,6 +4,7 @@
 //
 //  Created by Andrzej Kapolka on 5/10/13.
 //  Copyright 2013 High Fidelity, Inc.
+//  Copyright 2020 Vircadia contributors.
 //
 //  Distributed under the Apache License, Version 2.0.
 //  See the accompanying file LICENSE or http://www.apache.org/licenses/LICENSE-2.0.html
@@ -27,6 +28,7 @@
 #include <ThreadHelpers.h>
 #include <AbstractScriptingServicesInterface.h>
 #include <AbstractViewStateInterface.h>
+#include <ApplicationEvents.h>
 #include <EntityEditPacketSender.h>
 #include <EntityTreeRenderer.h>
 #include <FileScriptingInterface.h>
@@ -89,7 +91,6 @@ class AudioInjector;
 namespace controller {
     class StateController;
 }
-
 
 static const QString RUNNING_MARKER_FILENAME = "Interface.running";
 static const QString SCRIPTS_SWITCH = "scripts";

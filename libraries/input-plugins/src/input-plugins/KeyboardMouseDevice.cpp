@@ -10,8 +10,11 @@
 //
 #include "KeyboardMouseDevice.h"
 
+#include <QCursor>
+#include <QtGui/QGuiApplication>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QScreen>
 #include <QtGui/QTouchEvent>
 #include <QGesture>
 
@@ -114,7 +117,21 @@ void KeyboardMouseDevice::eraseMouseClicked() {
 }
 
 void KeyboardMouseDevice::mouseMoveEvent(QMouseEvent* event) {
+    int eventType = event->type();
     QPoint currentPos = event->pos();
+
+
+    //QScreen* screen = QGuiApplication::primaryScreen();
+    //QRect screenGeometry = screen->geometry();
+    //QPoint resetCursorPos;
+    //resetCursorPos.setX(screenGeometry.width() / 2);
+    //resetCursorPos.setY(screenGeometry.height() / 2);
+    //QPoint diffCursorPos = currentPos - resetCursorPos; 
+    //if (diffCursorPos.manhattanLength() > 400) {
+    //    QCursor::setPos(resetCursorPos);  // move cursor back to where it was
+    //}
+
+
 
     // FIXME - this has the characteristic that it will show large jumps when you move the cursor
     // outside of the application window, because we don't get MouseEvents when the cursor is outside

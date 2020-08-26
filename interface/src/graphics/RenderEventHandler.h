@@ -15,15 +15,6 @@
 #include <QElapsedTimer>
 #include "gl/OffscreenGLCanvas.h"
 
-enum ApplicationEvent {
-    // Execute a lambda function
-    Lambda = QEvent::User + 1,
-    // Trigger the next render
-    Render,
-    // Trigger the next idle
-    Idle,
-};
-
 class RenderEventHandler : public QObject {
     using Parent = QObject;
     Q_OBJECT

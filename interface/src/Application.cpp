@@ -45,6 +45,7 @@
 
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QWidget>
 
 #include <QtMultimedia/QMediaPlayer>
 
@@ -57,6 +58,7 @@
 #include <gl/GLWindow.h>
 #include <gl/GLHelpers.h>
 
+#include <ApplicationEvents.h>
 #include <shared/FileUtils.h>
 #include <shared/QtHelpers.h>
 #include <shared/PlatformHelper.h>
@@ -4246,6 +4248,9 @@ bool Application::event(QEvent* event) {
 
             return true;
 
+        case ApplicationEvent::MouseResetEvent:
+            mouseMoveEvent(static_cast<QMouseEvent*>(event));
+            return true;
         case QEvent::MouseMove:
             mouseMoveEvent(static_cast<QMouseEvent*>(event));
             return true;
@@ -4691,23 +4696,20 @@ void Application::maybeToggleMenuVisible(QMouseEvent* event) const {
 }
 
 void Application::mouseMoveEvent(QMouseEvent* event) {
+    int eventType = event->type();
+
+ //   qCDebug(interfaceapp) << "Event:" << event;
+
     PROFILE_RANGE(app_input_mouse, __FUNCTION__);
 
     maybeToggleMenuVisible(event);
 
     auto& compositor = getApplicationCompositor();
     
-    bool _ignoreNextMouseMove = compositor.getIgnoreNextMouseMove();
-    
     // if this is a real mouse event, and we're in HMD mode, then we should use it to move the
     // compositor reticle
     // handleRealMouseMoveEvent() will return true, if we shouldn't process the event further
     if (!compositor.fakeEventActive() && compositor.handleRealMouseMoveEvent()) {
-        return; // bail
-    }
-    
-    if (!compositor.fakeEventActive() && compositor.handleFirstPersonCaptureMouseMoveEvent()) {
-        // event->accept();
         return; // bail
     }
 
@@ -4745,13 +4747,21 @@ void Application::mouseMoveEvent(QMouseEvent* event) {
         return;
     }
 
-    if (_keyboardMouseDevice->isActive() && !_ignoreNextMouseMove) {
-        qCDebug(interfaceapp) << "_ignoreNextMouseMove" << _ignoreNextMouseMove;
+    if (_keyboardMouseDevice->isActive()) {
         _keyboardMouseDevice->mouseMoveEvent(event);
     }
 
-    compositor.setIgnoreNextMouseMove(false);
-    qCDebug(interfaceapp) << "_ignoreNextMouseMove" << _ignoreNextMouseMove;
+    if (!compositor.fakeEventActive() && compositor.handleFirstPersonCaptureMouseMoveEvent() &&
+        eventType != ApplicationEvent::MouseResetEvent) {
+        // event->accept();
+        QScreen* screen = QGuiApplication::primaryScreen();
+        QRect screenGeometry = screen->geometry();
+        QPointF windowPoint(screenGeometry.width() / 2, screenGeometry.height() / 2);
+
+        QMouseEvent* resetCursor = new QMouseEvent((QEvent::Type)ApplicationEvent::MouseResetEvent, windowPoint, windowPoint,
+                                                   windowPoint, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+        QApplication::postEvent(this, resetCursor, Qt::HighEventPriority);
+    }
 }
 
 void Application::mousePressEvent(QMouseEvent* event) {
