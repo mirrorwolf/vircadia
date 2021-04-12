@@ -101,6 +101,12 @@ Menu::Menu() {
         domainLogin->setVisible(hasLogIn);
     });
 
+    auto switchMetaverseServer = addActionToQMenuAndActionHash(fileMenu, "Switch Metaverse Server");
+    connect(switchMetaverseServer, &QAction::triggered, [] {
+        // auto dialogsManager = DependencyManager::get<DialogsManager>();
+        // dialogsManager->showDomainLoginDialog();
+    });
+
     // File > Quit
     addActionToQMenuAndActionHash(fileMenu, MenuOption::Quit, Qt::CTRL | Qt::Key_Q, qApp, SLOT(quit()), QAction::QuitRole);
 
